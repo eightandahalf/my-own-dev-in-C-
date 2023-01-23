@@ -1,0 +1,3 @@
+﻿  Main.c
+E:\Programming\C\Projects\garbage_collection\garbage_collection\Main.c(47,18): warning C4244: 'function': conversion from 'time_t' to 'unsigned int', possible loss of data
+  garbage_collection.vcxproj -> E:\Programming\C\Projects\garbage_collection\Debug\garbage_collection.exe

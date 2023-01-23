@@ -1,0 +1,5 @@
+﻿  Main.c
+E:\Programming\C\Projects\garbage_collection\garbage_collection\Main.c(47,18): warning C4244: 'function': conversion from 'time_t' to 'unsigned int', possible loss of data
+E:\Programming\C\Projects\garbage_collection\garbage_collection\Main.c(171,26): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+E:\Programming\C\Projects\garbage_collection\garbage_collection\Main.c(156,1): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+  garbage_collection.vcxproj -> E:\Programming\C\Projects\garbage_collection\x64\Debug\garbage_collection.exe
