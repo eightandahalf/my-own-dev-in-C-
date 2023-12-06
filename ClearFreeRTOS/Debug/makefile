@@ -60,8 +60,8 @@ all: main-build
 main-build: 05.12_clean_freertos.elf secondary-outputs
 
 # Tool invocations
-05.12_clean_freertos.elf 05.12_clean_freertos.map: $(OBJS) $(USER_OBJS) E:\Self_experience\Programming\github_projects\05.12_clean_freertos\STM32F401RCTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "05.12_clean_freertos.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"E:\Self_experience\Programming\github_projects\05.12_clean_freertos\STM32F401RCTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="05.12_clean_freertos.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+05.12_clean_freertos.elf 05.12_clean_freertos.map: $(OBJS) $(USER_OBJS) E:\Self_experience\Programming\github_projects\ClearFreeRTOS\STM32F401RCTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "05.12_clean_freertos.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"E:\Self_experience\Programming\github_projects\ClearFreeRTOS\STM32F401RCTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="05.12_clean_freertos.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

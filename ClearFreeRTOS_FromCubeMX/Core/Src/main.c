@@ -32,7 +32,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
+#define mainDELAY_LOOP_COUNT   ( 0xfffff )
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -55,6 +55,49 @@ void MX_FREERTOS_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+void vTask1( void *pvParameters )
+{
+	const char *pcTaskName = "Task 1 is running\r\n";
+	volatile uint32_t ul; /* volatile to ensure ul is not optimized away. */
+	/* As per most tasks, this task is implemented in an infinite loop. */
+	for( ;; )
+	{
+		/* Print out the name of this task. */
+
+//		vPrintString( pcTaskName );
+
+		/* Delay for a period. */
+		for( ul = 0; ul < mainDELAY_LOOP_COUNT; ul++ )
+		{
+			__NOP();
+			/* This loop is just a very crude delay implementation. There is
+			nothing to do in here. Later examples will replace this crude
+			loop with a proper delay/sleep function. */
+		}
+	}
+}
+
+void vTask2( void *pvParameters )
+{
+	const char *pcTaskName = "Task 2 is running\r\n";
+	volatile uint32_t ul; /* volatile to ensure ul is not optimized away. */
+	/* As per most tasks, this task is implemented in an infinite loop. */
+	for( ;; )
+	{
+		/* Print out the name of this task. */
+
+//		vPrintString( pcTaskName );
+
+		/* Delay for a period. */
+		for( ul = 0; ul < mainDELAY_LOOP_COUNT; ul++ )
+		{
+			/* This loop is just a very crude delay implementation. There is
+			nothing to do in here. Later examples will replace this crude
+			loop with a proper delay/sleep function. */
+		}
+	}
+}
+
 
 /* USER CODE END 0 */
 
@@ -88,20 +131,33 @@ int main(void)
   MX_GPIO_Init();
   /* USER CODE BEGIN 2 */
 
+  xTaskCreate( vTask1, /* Pointer to the function that implements the task. */
+  "Task 1",/* Text name for the task. This is to facilitate debugging only. */
+  1000, /* Stack depth - small microcontrollers will use much less stack than this. */
+  NULL, /* This example does not use the task parameter. */
+  1, /* This task will run at priority 1. */
+  NULL ); /* This example does not use the task handle. */
+
+  /* Create the other task in exactly the same way and at the same priority. */
+  xTaskCreate( vTask2, "Task 2", 1000, NULL, 1, NULL );
+  /* Start the scheduler so the tasks start executing. */
+  vTaskStartScheduler();
+
   /* USER CODE END 2 */
 
-  /* Call init function for freertos objects (in freertos.c) */
-  MX_FREERTOS_Init();
+//  /* Call init function for freertos objects (in freertos.c) */
+//  MX_FREERTOS_Init();
+//
+//  /* Start scheduler */
+//  vTaskStartScheduler();
+//  /* We should never get here as control is now taken by the scheduler */
 
-  /* Start scheduler */
-  vTaskStartScheduler();
-  /* We should never get here as control is now taken by the scheduler */
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
     /* USER CODE END WHILE */
-
+	  __NOP();
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
