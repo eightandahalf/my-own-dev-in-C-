@@ -1,0 +1,117 @@
+Как встроить чистый freertos в проект?
+1. Создать проект в CubeMX, настроить частоту тактирования, способ прошивки,
+таймеры, все, что требуется. Настройку freertos в CubeMX не трогать
+
+Настройка параметров STM32Cube
+В Device Configuration Tool (.ioc) > System Core > NVIC > Code Generation
+снимите флажок "Generate IRQ Handler" для параметра "Time base: System tick timer"
+снимите флажок "Generate IRQ Handler" для "Pendable Request for system service".
+снимите флажок "Generate IRQ Handler" для "System Service call via SWI instruction".
+В Device Configuration Tool (.ioc) > System Core > NVIC
+выберите группу приоритетов "4 bits for preemption, 0 bit for subpriority".
+В Device Configuration Tool (.ioc) > System Core > SYS
+выберите источник временной базы, отличный от "Systick", например TIM1
+
+Настроить доп параметры приоритетов как на картинке AdvanceNVICSettings 
+
+2. Скачать с официального сайта freertos zip файл, которая будет содержать файлы, 
+которые потребуются для внедрения freertos
+3. Извлечь из скачанной папки следующие файлы и вставить в следедующие папки проекта, который
+до этого сгенерировал CubeMX:
+а) 
+FreeRTOSv202212.01\FreeRTOS\Source\croutine.c
+FreeRTOSv202212.01\FreeRTOS\Source\event_groups.c
+FreeRTOSv202212.01\FreeRTOS\Source\list.c
+FreeRTOSv202212.01\FreeRTOS\Source\queue.c
+FreeRTOSv202212.01\FreeRTOS\Source\stream_buffer.c
+FreeRTOSv202212.01\FreeRTOS\Source\tasks.c
+FreeRTOSv202212.01\FreeRTOS\Source\timers.c
+
+Вставить эти файлы нужно в следующию директорию(где ClearFreeRTOS - имя проекта, который был ранее
+сгенерирован CubeMX), прежде создав эту директорию, которая должна иметь следующий путь:
+ClearFreeRTOS\Middlewares\Third_Party\FreeRTOS\Source
+б) 
+FreeRTOS\Source\include
+
+Вставить эту папку нужно по тому же пути, что мы создали:
+ClearFreeRTOS\Middlewares\Third_Party\FreeRTOS\Source
+в)
+FreeRTOS\Source\portable\MemMang
+
+Вставить эту папку нужно по следующими пути пути, предварительно создав папку portable в папке,
+в которую мы до этого добавляли файлы. Путь куда нужно добавить папку MemMang будет иметь такой путь:
+
+ClearFreeRTOS\Middlewares\Third_Party\FreeRTOS\Source\portable
+
+Далее, в папке MemMang нужно оставить только один исходный код, т.е. один способ распределения памяти
+г)
+в папке FreeRTOSv202212.01\FreeRTOS\Source\portable нужно найти компилятор, который используется для 
+компиляции проекта. При использовании CubeIDE компилятор будет GCC. Переходим в эту папку и находим 
+архитектура ядра нашего микроконтроллера. Т.к. используется STM32F401RCT6, то ядром является Arm Cortex-M4, 
+поэтому находим папку с названием ARM_CM4F(именно она, а не ARM_CM4_MPU):
+
+в папке ClearFreeRTOS\Middlewares\Third_Party\FreeRTOS\Source\portable создаем папку GCC, как название
+компилятора, что мы используем, и добавляем туда ту папку с названием ARM_CM4F. И получаем по итогу
+такой путь папки ARM_CM4F: 
+ClearFreeRTOS\Middlewares\Third_Party\FreeRTOS\Source\portable\GCC\ARM_CM4F
+
+4. Далее нужно добавить "пути" в настройки компилятора. p.s. до конца не понятно, зачем это, но это нужно сделать
+Находим "ClearFreeRTOS > Properties > C/C++ Build > Settings > Tool Settings > MCU GCC Compiler > Include paths"
+И нужно добавить следующие пути:
+../Middlewares/Third_Party/FreeRTOS/Source
+../Middlewares/Third_Party/FreeRTOS/Source/include
+../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F
+
+Нажимаем "применить" и выходим из этой настройки
+5. В проект нужно включить файл FreeRTOSConfig.h.
+
+Нам нужно вставить в проект файл, который можем взять из уже созданного проекта компанией freertos.
+Этот файл содержит многие конфигурации ядра freertos по типу максимальное число 
+приоритетов задач, как планировщик будет опредлять, кому выделить процессорное время и т.п.
+Все эти вещи определены как #define
+
+Так вот нам нужно найти проект в папке FreeRTOSv202212.01\FreeRTOS\Demo, который будет соответствовать
+архитектуре ядра нашего микроконтроллера. Да, эти проекты также зависят от компиляторов, но это не сильно
+влияет на содержание этого файла. Поэтому, ориентируемcя только на архитектуру ядра. У нас контроллер 
+STM32F401RCT6, у него архитектура ядра Arm Cortex-M4, если просмотреть папку Demo, то можно найти проект 
+со следующим именем CORTEX_M4F_STM32F407ZG-SK, который тоже основан на контроллере, имеющим архитектуру ядра
+Arm Cortex-M4, поэтому открываем этот проект, т.е. папку, и копируем от туда файл FreeRTOSConfig.h и вставляем
+в папку ClearFreeRTOS\Core\Inc
+
+FreeRTOSv202212.01\FreeRTOS\Demo\CORTEX_M4F_STM32F407ZG-SK\FreeRTOSConfig.h -> ClearFreeRTOS\Core\Inc
+
+6. Нужно добавить в исходный код файла main. следующую строку:
+/* USER CODE BEGIN Includes */
+#include "FreeRTOS.h"
+/* USER CODE END Includes */
+
+7.
+STM32Cube предоставляет менеджер памяти. А так как из FreeRTOS будет использоваться новый менеджер, 
+то его следует удалить из проекта. Путь, где этот файла находится "ClearFreeRTOS\Core\Src\sysmem.c"
+
+8.
+выбрать проект, нажать alt+enter, откроются настройки
+выбрать c/c++ general -> paths and symbols -> source location
+нажать add folder и выбрать папку middlewares
+
+9.
+короче, нужно генерировать сначала проект с cmsis, получать freertosconfig.h файл,
+а потом с ним что-то делать
+
+10. вставить следующие строчки кода в /*user code begin 0*/
+/* GetIdleTaskMemory prototype (linked to static allocation support) */
+void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer, StackType_t **ppxIdleTaskStackBuffer, uint32_t *pulIdleTaskStackSize );
+
+/* USER CODE BEGIN GET_IDLE_TASK_MEMORY */
+static StaticTask_t xIdleTaskTCBBuffer;
+static StackType_t xIdleStack[configMINIMAL_STACK_SIZE];
+
+void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer, StackType_t **ppxIdleTaskStackBuffer, uint32_t *pulIdleTaskStackSize )
+{
+  *ppxIdleTaskTCBBuffer = &xIdleTaskTCBBuffer;
+  *ppxIdleTaskStackBuffer = &xIdleStack[0];
+  *pulIdleTaskStackSize = configMINIMAL_STACK_SIZE;
+  /* place for user code */
+}
+
+11. Готово. Можно инициализовывать задачи и запускать проект
