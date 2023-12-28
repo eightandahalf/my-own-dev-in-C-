@@ -116,4 +116,14 @@ void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer, StackTy
   /* place for user code */
 }
 
-11. Готово. Можно инициализовывать задачи и запускать проект
+11. добавить в main.h следующий код
+/* USER CODE BEGIN Includes */
+#include "FreeRTOS.h"
+#include "task.h"
+#include "timers.h"
+#include "queue.h"
+#include "semphr.h"
+#include "event_groups.h"
+/* USER CODE END Includes */
+
+12. Готово. Можно инициализовывать задачи и запускать проект
